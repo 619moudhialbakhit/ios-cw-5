@@ -8,6 +8,8 @@
 
 import UIKit
 
+import AVFoundation
+
 class ViewController: UIViewController {
     
     @IBOutlet weak var turnLabel: UILabel!
@@ -20,12 +22,52 @@ class ViewController: UIViewController {
     @IBOutlet weak var b7: UIButton!
     @IBOutlet weak var b8: UIButton!
     @IBOutlet weak var b9: UIButton!
+    @IBOutlet weak var backaGround: UIImageView!
+    @IBOutlet weak var oScore: UILabel!
+    @IBOutlet weak var xScore: UILabel!
     
     var turn = 0
     
+    var backGroundMusic: AVAudioPlayer?
     
+    func playbackGroundMusic(){
+        let path = Bundle.main.path(forResource: "RPReplay_Final1593486900.MP4", ofType:nil)!
+        let url = URL(fileURLWithPath: path)
+        
+        do {
+            backGroundMusic = try AVAudioPlayer(contentsOf: url)
+            backGroundMusic?.play()
+        } catch {
+            // couldn't load file :(
+        }
+    }
+    
+    func playrandomSound(){
+        var soundName = ["RPReplay_Final1593486461.mp3",
+            "RPReplay_Final1593486094.mp3",
+            "RPReplay_Final1593486174_2.mp3",
+            "RPReplay_Final1593485636.mp3",
+            "RPReplay_Final1593480097.mp3",
+            "RPReplay_Final1593479794.mp3",
+            "RPReplay_Final1593479685.mp3",
+            "RPReplay_Final1593479589.mp3",
+            "RPReplay_Final1593479751.mp3"]
+        
+        
+        let path = Bundle.main.path(forResource: soundName.randomElement(), ofType: nil!)!
+        let url = URL(fileURLWithPath: path)
+        
+        do {
+            backGroundMusic = try AVAudioPlayer(contentsOf: url)
+            backGroundMusic?.play()
+        } catch {
+            // couldn't load file :(
+        }
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
+        playbackGroundMusic()
+        
         // Do any additional setup after loading the view.
     }
     
@@ -33,26 +75,30 @@ class ViewController: UIViewController {
         if turn % 2 == 0{
             sender.setTitle("X", for: .normal)
             turnLabel.text = ("O Turn")
+            sender.setTitleColor(.green, for: .normal)
             
         }
         else{
             sender.setTitle("O", for: .normal)
             turnLabel.text = ("X Turn")
+            sender.setTitleColor(.blue, for: .normal)
         }
         print(turn)
         sender.isUserInteractionEnabled = false
         turn += 1
         
         if checkWinner(p: "X"){
-        okAlert(title: " X wins 🎉", message: "Congratulations, now reset the game!!")
+            okAlert(title: " X wins 🎉", message: "Congratulations, now reset the game!!")
         }
         else if checkWinner(p: "O"){
-          okAlert(title: " O wins 🎉", message: "Congratulations, now reset the game!!")
+            okAlert(title: " O wins 🎉", message: "Congratulations, now reset the game!!")
         }
         else if turn == 9{
-             okAlert(title: "No one wins", message: "now reset the game!!")
+            okAlert(title: "No one wins", message: "now reset the game!!")
             
         }
+ playrandomSound()
+        
     }
     
     func checkWinner(p: String) -> Bool{
@@ -81,11 +127,17 @@ class ViewController: UIViewController {
         }
         else{
             return false
+            
         }
     }
     
     
+    
     @IBAction func reset(_ sender: Any) {
+        resetGame()
+        
+    }
+    func resetGame(){
         b1.titleLabel?.text = ""
         b2.titleLabel?.text = ""
         b3.titleLabel?.text = ""
@@ -117,14 +169,23 @@ class ViewController: UIViewController {
         b9.isUserInteractionEnabled = true
         
         turn = 0
+        if backaGround.image ==  UIImage(named: "DCdXVvLXcAELB8M"){
+            backaGround.image = UIImage(named: "background")
+        } else{
+            backaGround.image = UIImage(named:  "DCdXVvLXcAELB8M")
+        }
+        
     }
     
     func okAlert(title: String, message: String)
     {
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let okAction = UIAlertAction(title: "Ok", style: .cancel)
+        let okAction = UIAlertAction(title: "Ok", style: .cancel) { alart in
+            self.resetGame()
+        }
         alertController.addAction(okAction)
         present(alertController, animated: true)
     }
 }
+
 
